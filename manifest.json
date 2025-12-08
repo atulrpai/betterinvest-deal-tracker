@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "BetterInvest Deal Tracker",
+  "version": "1.0",
+  "permissions": ["tabs", "scripting", "activeTab"],
+  "host_permissions": ["https://app.betterinvest.club/*"],
+  "action": {
+    "default_popup": "src/html/popup.html",
+    "default_icon": {
+      "16": "assets/images/icon.png",
+      "48": "assets/images/icon.png",
+      "128": "assets/images/icon.png"
+    }
+  },
+  "icons": {
+    "16": "assets/images/icon.png",
+    "48": "assets/images/icon.png",
+    "128": "assets/images/icon.png"
+  },
+  "background": {
+    "service_worker": "src/scripts/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://app.betterinvest.club/*"],
+      "js": ["src/scripts/content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
