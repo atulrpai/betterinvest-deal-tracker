@@ -1,11 +1,21 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-	document.getElementById("loadAllDeals").addEventListener("click", () => {
-		chrome.tabs.query( { active: true, currentWindow: true }, (tabs) => { 
-			chrome.tabs.sendMessage( tabs[0].id, {
-				message: "loadAllDeals"
-			});
-		});
-	});
+    function sendMessageAndClose(message, buttonId) {
+
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            chrome.tabs.sendMessage(tabs[0].id, { message });
+        });
+
+        window.close();
+
+    }
+
+    document.getElementById("loadAllDeals").addEventListener("click", () => {
+        sendMessageAndClose("loadAllDeals", "loadAllDeals");
+    });
+
+    document.getElementById("loadTrackerData").addEventListener("click", () => {
+        sendMessageAndClose("loadTrackerData", "loadTrackerData");
+    });
 
 });
