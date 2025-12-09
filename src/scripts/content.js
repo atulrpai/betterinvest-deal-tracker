@@ -1,6 +1,3 @@
-var areAllDealsLoaded = false;
-var isTrackerDataLoaded = false;
-
 async function createModal(title, existingData, onSave) {
     if ( document.getElementById("tracker-popup") ) return;
 
@@ -22,7 +19,6 @@ async function createModal(title, existingData, onSave) {
 
     document.getElementById("tracker-title").innerText = title;
     document.getElementById("tracker-project").value = existingData.project || "";
-    document.getElementById("tracker-url").value = existingData.url || "";
     document.getElementById("tracker-buyer").value = existingData.buyer || "";
 
     document.getElementById("tracker-cancel").addEventListener("click", () => {
@@ -32,7 +28,6 @@ async function createModal(title, existingData, onSave) {
     document.getElementById("tracker-save").addEventListener("click", () => {
         const newData = {
             project: document.getElementById("tracker-project").value,
-            url: document.getElementById("tracker-url").value,
             buyer: document.getElementById("tracker-buyer").value
         };
         
@@ -44,11 +39,11 @@ async function createModal(title, existingData, onSave) {
 function openTrackerPopup(title) {
     if (!title) return;
 
-    chrome.storage.local.get([title], (result) => {
-        const data = result[title] || { project: "", url: "", buyer: "" };
+    chrome.storage.sync.get([title], (result) => {
+        const data = result[title] || { project: "", buyer: "" };
 
         createModal(title, data, (newData) => {            
-            chrome.storage.local.set({ [title]: newData }, () => {
+            chrome.storage.sync.set({ [title]: newData }, () => {
                 alert("TRACKER UPDATED FOR " + title);
             });
 
@@ -61,10 +56,11 @@ function loadTrackerData() {
     const iconURL = chrome.runtime.getURL("assets/images/info.png");
 
     document.querySelectorAll("button.material-icons").forEach(btn => {
-        if (btn.innerText.trim() !== "keyboard_arrow_right" || !btn.previousElementSibling) return;
+        if (btn.innerText.trim() !== "keyboard_arrow_right" || !btn.previousElementSibling || btn.parentElement.querySelector(".tracker-injected")) return;
 
         const icon = document.createElement("img");
         icon.src = iconURL;
+	icon.classList.add("tracker-injected");
         
         const btnStyle = window.getComputedStyle(btn);
         icon.style.width = btnStyle.width;
@@ -116,17 +112,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     switch (request.message) {
 
         case "loadAllDeals":
-            if (!areAllDealsLoaded) {
-                areAllDealsLoaded = true;
-                loadAllDeals();
-            }
+            loadAllDeals();
             break;
 
         case "loadTrackerData":
-            if (! isTrackerDataLoaded) {
-                isTrackerDataLoaded = true;
-                loadTrackerData();
-            }
+            loadTrackerData();
             break;
 
     }
