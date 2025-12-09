@@ -39,11 +39,11 @@ async function createModal(title, existingData, onSave) {
 function openTrackerPopup(title) {
     if (!title) return;
 
-    chrome.storage.sync.get([title], (result) => {
+    chrome.storage.local.get([title], (result) => {
         const data = result[title] || { project: "", buyer: "" };
 
         createModal(title, data, (newData) => {            
-            chrome.storage.sync.set({ [title]: newData }, () => {
+            chrome.storage.local.set({ [title]: newData }, () => {
                 alert("TRACKER UPDATED FOR " + title);
             });
 
