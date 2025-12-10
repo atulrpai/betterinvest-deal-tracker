@@ -27,7 +27,7 @@
 
   "web_accessible_resources": [
     {
-      "resources": ["assets/images/info.png", "src/html/tracker.html"],
+      "resources": ["assets/images/info.png", "assets/images/no-info.png", "src/html/tracker.html"],
       "matches": ["https://app.betterinvest.club/*"]
     }
   ]

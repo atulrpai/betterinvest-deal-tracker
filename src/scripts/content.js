@@ -36,7 +36,7 @@ async function createModal(title, existingData, onSave) {
     });
 }
 
-function openTrackerPopup(title) {
+function openTrackerPopup(title, icon, srcUrl) {
     if (!title) return;
 
     chrome.storage.local.get([title], (result) => {
@@ -44,6 +44,7 @@ function openTrackerPopup(title) {
 
         createModal(title, data, (newData) => {            
             chrome.storage.local.set({ [title]: newData }, () => {
+                icon.src = srcUrl;
                 alert("TRACKER UPDATED FOR " + title);
             });
 
@@ -51,29 +52,37 @@ function openTrackerPopup(title) {
     });
 }
 
-function loadTrackerData() {
+async function loadTrackerData() {
+    const infoIconURL = chrome.runtime.getURL("assets/images/info.png");
+    const noInfoIconURL = chrome.runtime.getURL("assets/images/no-info.png");
 
-    const iconURL = chrome.runtime.getURL("assets/images/info.png");
+    const buttons = document.querySelectorAll("button.material-icons");
 
-    document.querySelectorAll("button.material-icons").forEach(btn => {
-        if (btn.innerText.trim() !== "keyboard_arrow_right" || !btn.previousElementSibling || btn.parentElement.querySelector(".tracker-injected")) return;
+    for (const btn of buttons) {
+        if (btn.innerText.trim() !== "keyboard_arrow_right" || !btn.previousElementSibling || btn.parentElement.querySelector(".tracker-injected")) continue;
+
+        const dealName = btn.previousElementSibling.innerText.trim();
 
         const icon = document.createElement("img");
-        icon.src = iconURL;
-	icon.classList.add("tracker-injected");
-        
+        icon.src = await new Promise((resolve) => {
+            chrome.storage.local.get([dealName], (result) => {
+                resolve(result && result.hasOwnProperty(dealName) ? infoIconURL : noInfoIconURL);
+            });
+        });
+        icon.classList.add("tracker-injected");
+
         const btnStyle = window.getComputedStyle(btn);
         icon.style.width = btnStyle.width;
         icon.style.height = btnStyle.height;
-	icon.style.order = parseInt(btnStyle.order) + 1;
+        icon.style.order = parseInt(btnStyle.order) + 1;
 
         icon.addEventListener("click", (e) => {
             e.stopPropagation();
-            openTrackerPopup(btn.previousElementSibling.innerText.trim());
+            openTrackerPopup(dealName, icon, infoIconURL);
         });
 
         btn.insertAdjacentElement("afterend", icon);
-    });
+    }
 
     alert("TRACKER DATA LOADED");
 }
