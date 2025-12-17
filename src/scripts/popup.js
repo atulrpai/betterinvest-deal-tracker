@@ -18,4 +18,8 @@ document.addEventListener('DOMContentLoaded', function () {
         sendMessageAndClose("loadTrackerData", "loadTrackerData");
     });
 
+    document.getElementById("editDataBase").addEventListener("click", () => {
+        sendMessageAndClose("editDataBase", "editDataBase");
+    });
+
 });
